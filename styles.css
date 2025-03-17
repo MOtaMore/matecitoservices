@@ -1,0 +1,131 @@
+.hero-section {
+    padding: 120px 0 60px;
+    background: linear-gradient(135deg, #6c757d 0%, #343a40 100%);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+#news {
+    background-color: #f8f9fa;
+}
+
+#announcements-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.announcement {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.announcement h3 {
+    color: #343a40;
+    margin-bottom: 10px;
+}
+
+.announcement .date {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+#add-bot {
+    background: linear-gradient(45deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1) !important;
+}
+
+.add-bot-btn {
+    background: #5865F2;
+    border-color: #5865F2;
+    font-size: 1.1rem;
+    padding: 15px 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(88, 101, 242, 0.2);
+}
+
+.add-bot-btn:hover {
+    background: #4752C4;
+    border-color: #4752C4;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(88, 101, 242, 0.3);
+}
+
+.card-title {
+    color: #2F3136;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.card-text {
+    color: #4F545C;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+#tos {
+    background-color: white;
+}
+
+#tos-content, #pp-content {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    height: 400px;
+    overflow-y: auto;
+    margin-top: 20px;
+}
+
+.btn-primary {
+    padding: 12px 30px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 100px 0 40px;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    .lead {
+        font-size: 1.1rem;
+    }
+}
