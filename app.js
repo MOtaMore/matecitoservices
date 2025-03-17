@@ -1,23 +1,40 @@
-// Firebase configuration - Replace with your Firebase project config
-const firebaseConfig = {
-    // Add your Firebase config here
-};
+// Constants
+const DISCORD_WIDGET_URL = 'https://discord.com/api/guilds/1336406381640548473/widget.json';
+const DISCORD_INVITE_URL = 'https://discord.gg/jAUYsFBsrD';
+const DISCORD_BOT_INVITE_URL = 'https://discord.com/oauth2/authorize?client_id=1283401603843493960&permissions=689879477312&integration_type=0&scope=bot';
+const WIDGET_UPDATE_INTERVAL = 60000; // 60 seconds
 
-// Initialize Firebase (uncomment when config is added)
-// firebase.initializeApp(firebaseConfig);
+// Cache for Discord widget data
+let widgetDataCache = null;
+let lastFetchTime = 0;
+const CACHE_DURATION = 30000; // 30 seconds
 
-// Function to fetch Discord widget data
+// Function to fetch Discord widget data with caching
 async function fetchDiscordWidgetData() {
+    const now = Date.now();
+    if (widgetDataCache && (now - lastFetchTime) < CACHE_DURATION) {
+        return widgetDataCache;
+    }
+
     try {
-        const response = await fetch('https://discord.com/api/guilds/1336406381640548473/widget.json');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+        const response = await fetch(DISCORD_WIDGET_URL, {
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
         if (!response.ok) {
-            throw new Error('Widget not enabled or server not found');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        widgetDataCache = data;
+        lastFetchTime = now;
         return data;
     } catch (error) {
-        console.error('Error fetching Discord widget data:', error);
-        return null;
+        console.error('Error fetching Discord widget data:', error.name === 'AbortError' ? 'Request timeout' : error.message);
+        return widgetDataCache || null; // Return cached data if available, otherwise null
     }
 }
 
@@ -67,29 +84,49 @@ async function updateDiscordWidget() {
     }
 }
 
+// Debounce function for performance optimization
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Handle smooth scrolling for navigation links
+    // Handle smooth scrolling for navigation links with debounce
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
+        anchor.addEventListener('click', debounce(function (e) {
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
             if (target) {
                 target.scrollIntoView({
-                    behavior: 'smooth'
+                    behavior: 'smooth',
+                    block: 'start'
                 });
             }
-        });
+        }, 100));
     });
 
-    // Initialize Discord widget
-    updateDiscordWidget();
-    // Update Discord widget every 60 seconds
-    setInterval(updateDiscordWidget, 60000);
+    // Initialize Discord widget with error handling
+    try {
+        updateDiscordWidget();
+        // Update Discord widget periodically
+        const widgetInterval = setInterval(updateDiscordWidget, WIDGET_UPDATE_INTERVAL);
+        // Cleanup interval on page unload
+        window.addEventListener('unload', () => clearInterval(widgetInterval));
+    } catch (error) {
+        console.error('Error initializing Discord widget:', error);
+    }
 
     // Add Discord Bot with direct OAuth2 URL
     const addToDiscordBtn = document.getElementById('add-to-discord');
     if (addToDiscordBtn) {
-        addToDiscordBtn.href = 'https://discord.com/oauth2/authorize?client_id=1283401603843493960&permissions=689879477312&integration_type=0&scope=bot';
+        addToDiscordBtn.href = DISCORD_BOT_INVITE_URL;
     }
 
     // Load announcements
@@ -104,7 +141,8 @@ async function loadAnnouncements() {
     if (!container) return;
 
     try {
-        // Replace this with actual API call to your backend/Firebase
+        // Use DocumentFragment for better performance
+        const fragment = document.createDocumentFragment();
         const announcements = [
             {
                 title: 'Nueva Función: Precios Regionales de Steam en América',
@@ -115,8 +153,12 @@ async function loadAnnouncements() {
 
         announcements.forEach(announcement => {
             const announcementElement = createAnnouncementElement(announcement);
-            container.appendChild(announcementElement);
+            fragment.appendChild(announcementElement);
         });
+
+        // Clear existing content and append all announcements at once
+        container.innerHTML = '';
+        container.appendChild(fragment);
     } catch (error) {
         console.error('Error loading announcements:', error);
         container.innerHTML = '<p class="text-center">Error al cargar los anuncios.</p>';
