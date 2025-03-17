@@ -70,7 +70,6 @@ async function updateDiscordWidget() {
             <div class="server-info">
                 <h4>${data.name || 'Servidor de Matecito'}</h4>
                 <p>🟢 ${data.presence_count || 0} miembros en línea</p>
-                ${data.instant_invite ? `<a href="${data.instant_invite}" class="btn btn-primary btn-sm mt-2" target="_blank">Unirse al Servidor</a>` : ''}
             </div>
         `;
     }
