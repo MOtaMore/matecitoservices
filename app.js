@@ -6,6 +6,67 @@ const firebaseConfig = {
 // Initialize Firebase (uncomment when config is added)
 // firebase.initializeApp(firebaseConfig);
 
+// Function to fetch Discord widget data
+async function fetchDiscordWidgetData() {
+    try {
+        const response = await fetch('https://discord.com/api/guilds/1336406381640548473/widget.json');
+        if (!response.ok) {
+            throw new Error('Widget not enabled or server not found');
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching Discord widget data:', error);
+        return null;
+    }
+}
+
+// Function to update Discord widget information
+async function updateDiscordWidget() {
+    const data = await fetchDiscordWidgetData();
+    const widgetContainer = document.querySelector('.discord-widget-container');
+    if (!widgetContainer) return;
+
+    const widgetInfo = document.createElement('div');
+    widgetInfo.className = 'discord-widget-info';
+
+    if (!data) {
+        widgetInfo.innerHTML = `
+            <div class="server-info error">
+                <h4>Estado del Servidor</h4>
+                <p>⚠️ No se pudo cargar la información del servidor. El Widget del servidor no está habilitado.</p>
+                <div class="mt-3">
+                    <p><strong>Para habilitar el Widget:</strong></p>
+                    <ol class="text-start">
+                        <li>Abre la Configuración del Servidor en Discord</li>
+                        <li>Ve a la sección "Widget"</li>
+                        <li>Activa "Habilitar Widget del Servidor"</li>
+                        <li>Guarda los cambios</li>
+                    </ol>
+                </div>
+                <small class="d-block mt-2">Si necesitas ayuda, únete a nuestro <a href="https://discord.gg/jAUYsFBsrD" target="_blank" class="text-info">servidor de soporte</a></small>
+            </div>
+        `;
+
+    } else {
+        widgetInfo.innerHTML = `
+            <div class="server-info">
+                <h4>${data.name || 'Servidor de Matecito'}</h4>
+                <p>🟢 ${data.presence_count || 0} miembros en línea</p>
+                ${data.instant_invite ? `<a href="${data.instant_invite}" class="btn btn-primary btn-sm mt-2" target="_blank">Unirse al Servidor</a>` : ''}
+            </div>
+        `;
+    }
+
+    // Update widget container
+    const existingInfo = widgetContainer.querySelector('.discord-widget-info');
+    if (existingInfo) {
+        widgetContainer.replaceChild(widgetInfo, existingInfo);
+    } else {
+        widgetContainer.insertBefore(widgetInfo, widgetContainer.firstChild);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Handle smooth scrolling for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -19,6 +80,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Initialize Discord widget
+    updateDiscordWidget();
+    // Update Discord widget every 60 seconds
+    setInterval(updateDiscordWidget, 60000);
 
     // Add Discord Bot with direct OAuth2 URL
     const addToDiscordBtn = document.getElementById('add-to-discord');

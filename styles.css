@@ -22,10 +22,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><circle cx="40" cy="40" r="30" fill="%23FCB514" /></svg>');
-    background-size: 80px;
-    background-position: center;
-    opacity: 0.1;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
     pointer-events: none;
 }
 
